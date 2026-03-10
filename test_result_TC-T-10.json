@@ -1,0 +1,102 @@
+{
+  "test_name": "TC-T-10: 모둠활동 작성하기 - 모둠형",
+  "test_date": "2026-03-10 13:02:34",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "선생님 입장하기",
+      "check_item": "진입 페이지",
+      "detail": "선생님 입장하기 버튼 클릭 > 메인 페이지 이동",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "모둠활동 메뉴 클릭",
+      "check_item": "LNB 메뉴",
+      "detail": "모둠활동 메뉴 클릭 > 모둠활동 리스트 페이지 이동",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "모둠활동 페이지 확인",
+      "check_item": "페이지 노출",
+      "detail": "모둠활동 리스트 페이지 키워드 확인 (found: True)",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "작성하기 버튼 클릭",
+      "check_item": "버튼 클릭",
+      "detail": "작성하기 버튼 클릭 (1개 발견)",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "활동 만들기 팝업 확인",
+      "check_item": "팝업 노출",
+      "detail": "활동 만들기 팝업 키워드 확인 (found: True)",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "활동 이름 입력",
+      "check_item": "입력 필드",
+      "detail": "활동 이름 \"sample\" 입력 (성공)",
+      "status": "PASS"
+    },
+    {
+      "step": 7,
+      "action": "모둠형 선택",
+      "check_item": "라디오 버튼",
+      "detail": "모둠형 옵션 선택 (성공)",
+      "status": "PASS"
+    },
+    {
+      "step": 8,
+      "action": "만들기 버튼 클릭",
+      "check_item": "버튼 클릭",
+      "detail": "만들기 버튼 클릭 > 새 창 열림",
+      "status": "PASS"
+    },
+    {
+      "step": 9,
+      "action": "새 창 확인",
+      "check_item": "새 창 URL",
+      "detail": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2574?isNew=true",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "모둠활동_페이지": {
+      "found": true,
+      "status": "PASS"
+    },
+    "작성하기_버튼": {
+      "found": true,
+      "count": 1,
+      "status": "PASS"
+    },
+    "활동_만들기_팝업": {
+      "found": true,
+      "status": "PASS"
+    },
+    "활동_이름_입력": {
+      "found": true,
+      "value": "sample",
+      "status": "PASS"
+    },
+    "모둠형_선택": {
+      "found": true,
+      "status": "PASS"
+    },
+    "새창_sample": {
+      "found": true,
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2574?isNew=true",
+      "title": "동아출판 AI 디지털 교육자료",
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

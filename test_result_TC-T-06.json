@@ -1,0 +1,85 @@
+{
+  "test_name": "TC-T-06: 재구성하기 테스트",
+  "test_date": "2026-03-10 12:55:09",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "선생님 입장하기",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "교과서 메뉴 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "단원 리스트 노출 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "재구성하기 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "재구성 페이지 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "임시저장 삭제 버튼 확인",
+      "status": "SKIP"
+    },
+    {
+      "step": 7,
+      "action": "임시저장 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 8,
+      "action": "미리보기 뷰어 확인",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "단원_리스트": {
+      "found": true,
+      "status": "PASS"
+    },
+    "재구성하기_버튼": {
+      "found": true,
+      "count": 8,
+      "status": "PASS"
+    },
+    "재구성_페이지": {
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/textbook/detail/49727",
+      "found_keywords": [
+        "재구성",
+        "저장"
+      ],
+      "status": "PASS"
+    },
+    "임시저장_삭제": {
+      "found": false,
+      "status": "SKIP"
+    },
+    "임시저장_버튼": {
+      "found": true,
+      "count": 1,
+      "status": "PASS"
+    },
+    "미리보기_뷰어": {
+      "found": true,
+      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4918/49727/975106/2816528/entrance?mode=course_preview",
+      "content_keywords": [
+        "목차"
+      ],
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

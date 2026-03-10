@@ -1,0 +1,63 @@
+{
+  "test_name": "TC-T-01: 교사 홈 진입 테스트",
+  "test_date": "2026-03-10 12:45:51",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "진입 페이지 접속",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "선생님 입장하기 클릭 및 새 창 진입",
+      "status": "PASS"
+    }
+  ],
+  "element_checks": {
+    "오늘 수업/수업 시작하기": {
+      "found": true,
+      "selector": "[class*='today']",
+      "required": true,
+      "status": "PASS"
+    },
+    "교과서": {
+      "found": true,
+      "selector": "[class*='textbook']",
+      "required": true,
+      "status": "PASS"
+    },
+    "출석체크": {
+      "found": true,
+      "selector": "[class*='attendance']",
+      "required": true,
+      "status": "PASS"
+    },
+    "과제": {
+      "found": true,
+      "selector": "[class*='assignment']",
+      "required": true,
+      "status": "PASS"
+    },
+    "수업 분석/학급 분석": {
+      "found": true,
+      "selector": "[class*='analysis']",
+      "required": true,
+      "status": "PASS"
+    },
+    "우리반 기분": {
+      "found": true,
+      "selector": "[class*='mood']",
+      "required": true,
+      "status": "PASS"
+    },
+    "게시판/공지사항": {
+      "found": true,
+      "selector": "[class*='board']",
+      "required": true,
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

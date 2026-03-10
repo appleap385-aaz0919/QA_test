@@ -1,0 +1,15 @@
+https://edupass.neisplus.kr/AI_DT/login.do
+
+https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon
+
+
+ ## 사용법
+  방법 1: 간단 명령어 (스킬)
+
+  향후 테스트 시 다음 명령어만 입력하시면 됩니다:
+  /aidt-full-qa
+
+  방법 2: 직접 스크립트 실행
+
+  cd D:\jaehyuk.myung\claude_demo\Demo_13_QA
+  python aidt_full_qa_test.py

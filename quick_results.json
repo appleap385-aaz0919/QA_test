@@ -1,0 +1,62 @@
+{
+  "teacher": {
+    "T01": {
+      "name": "홈_기본",
+      "result": "PASS"
+    },
+    "T02": {
+      "name": "홈_출석",
+      "result": "PASS"
+    },
+    "T03": {
+      "name": "홈_과제",
+      "result": "PASS"
+    },
+    "T04": {
+      "name": "교과서_기본",
+      "result": "PASS"
+    },
+    "T05": {
+      "name": "과제_기본",
+      "result": "PASS"
+    },
+    "T06": {
+      "name": "AI평가_기본",
+      "result": "PASS"
+    },
+    "T07": {
+      "name": "AI학습관_기본",
+      "result": "PASS"
+    },
+    "T08": {
+      "name": "학생_기본",
+      "result": "PASS"
+    }
+  },
+  "student": {
+    "S01": {
+      "name": "홈_기본",
+      "result": "PASS"
+    },
+    "S02": {
+      "name": "홈_기분",
+      "result": "FAIL"
+    },
+    "S03": {
+      "name": "교과서_기본",
+      "result": "PASS"
+    },
+    "S04": {
+      "name": "과제_기본",
+      "result": "PASS"
+    },
+    "S05": {
+      "name": "AI평가_기본",
+      "result": "PASS"
+    },
+    "S06": {
+      "name": "AI학습관_기본",
+      "result": "PASS"
+    }
+  }
+}

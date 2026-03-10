@@ -1,0 +1,92 @@
+{
+  "test_name": "TC-T-07: 재구성 배포 동작 확인",
+  "test_date": "2026-03-10 12:56:43",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "선생님 입장하기",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "교과서 메뉴 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "단원 리스트 노출 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "재구성하기 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "재구성 페이지 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "임시저장 삭제 버튼 확인",
+      "status": "SKIP"
+    },
+    {
+      "step": 7,
+      "action": "임시저장 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 8,
+      "action": "배포 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 9,
+      "action": "배포 확인 버튼 클릭",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "단원_리스트": {
+      "found": true,
+      "status": "PASS"
+    },
+    "재구성하기_버튼": {
+      "found": true,
+      "count": 8,
+      "status": "PASS"
+    },
+    "재구성_페이지": {
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/textbook/detail/49565",
+      "found_keywords": [
+        "재구성",
+        "저장",
+        "배포"
+      ],
+      "status": "PASS"
+    },
+    "임시저장_삭제": {
+      "found": false,
+      "status": "SKIP"
+    },
+    "임시저장_버튼": {
+      "found": true,
+      "count": 1,
+      "status": "PASS"
+    },
+    "배포_버튼": {
+      "found": true,
+      "count": 1,
+      "status": "PASS"
+    },
+    "배포_확인": {
+      "modal_clicked": true,
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

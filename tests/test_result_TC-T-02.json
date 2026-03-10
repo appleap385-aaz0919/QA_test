@@ -1,0 +1,131 @@
+{
+  "test_name": "TC-T-02: 홈 카드 인사이트 노출 확인",
+  "test_date": "2026-03-03 15:03:54",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "진입 페이지 접속",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "새 창 진입",
+      "status": "PASS"
+    }
+  ],
+  "card_checks": {
+    "프로필 섹션": {
+      "found": true,
+      "details": {
+        "프로필_이미지": true,
+        "선생님_이름": "최초록 선생님",
+        "학급_이름": "전시관_1",
+        "학급_분석_버튼": true
+      },
+      "status": "PASS"
+    },
+    "오늘수업 카드": {
+      "found": true,
+      "details": {
+        "chapter": "미발견",
+        "session": "미발견",
+        "lesson_name": "Lesson 1. The Future Is in Our Hands"
+      },
+      "status": "PASS"
+    },
+    "교과서 카드": {
+      "found": true,
+      "restructure_btn": true,
+      "status": "PASS"
+    },
+    "진도 카드": {
+      "count": 2,
+      "expected_count": 2,
+      "cards": [
+        {
+          "chapter": "1단원 The Future Is in Our Hands",
+          "module": "AI 단원 진단평가"
+        },
+        {
+          "chapter": "1단원 The Future Is in Our Hands",
+          "module": "Watch and Talk"
+        }
+      ],
+      "status": "PASS"
+    },
+    "출석체크 카드": {
+      "found": true,
+      "details": {
+        "total": "5명",
+        "present": "0명",
+        "absent": "5명",
+        "not_agreed": "0명"
+      },
+      "status": "PASS"
+    },
+    "진행중인 과제 카드": {
+      "found": true,
+      "details": {
+        "total_count": "4건",
+        "submission_status": [
+          "제출 0/5",
+          "제출 5/5"
+        ],
+        "evaluation_status": [
+          "평가 0/0",
+          "평가 0/5"
+        ]
+      },
+      "status": "PASS"
+    },
+    "수업 분석 카드": {
+      "found": true,
+      "details": {
+        "학생_현황": true,
+        "학습_수준": "3명, 1명, 1명, 5명",
+        "학습_태도": "0명, 2명, 3명, 5명",
+        "AI_단원_진단평가_점수": "78점",
+        "AI_형성평가_점수": "75점"
+      },
+      "status": "PASS"
+    },
+    "오답노트 카드": {
+      "found": true,
+      "details": {
+        "복습_전": "30개",
+        "복습_완료": "14개",
+        "복습률": "32%"
+      },
+      "status": "PASS"
+    },
+    "우리반 기분 카드": {
+      "found": true,
+      "details": {
+        "counts": [
+          "2명",
+          "3명",
+          "0명",
+          "0명",
+          "0명"
+        ],
+        "classification_count": 5
+      },
+      "status": "PASS"
+    },
+    "공지사항 카드": {
+      "found": true,
+      "details": {
+        "category": "게시판",
+        "titles": [],
+        "dates": [
+          "2026.02.06",
+          "2026.02.09"
+        ]
+      },
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

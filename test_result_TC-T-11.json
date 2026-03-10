@@ -1,0 +1,77 @@
+{
+  "test_name": "TC-T-11: 모둠활동 복사/공개/비공개/삭제",
+  "test_date": "2026-03-10 13:05:08",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "[환경설정] sample 활동 생성",
+      "check_item": "sample 활동 생성",
+      "detail": "sample 이름의 타일형 활동 생성 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "[테스트 1] 복사하기",
+      "check_item": "[복사본]sample 생성",
+      "detail": "[복사본]sample 활동 생성 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "[테스트 2] 공개하기",
+      "check_item": "공개 변경 + 토스트",
+      "detail": "토스트 알림: \"활동이 공개 되었습니다.\"",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "[테스트 3] 비공개하기",
+      "check_item": "비공개 변경 + 토스트",
+      "detail": "토스트 알림: \"활동이 비공개 되었습니다.\"",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "[테스트 4] 삭제하기",
+      "check_item": "삭제 + 토스트",
+      "detail": "토스트 알림: \"활동이 삭제 되었습니다.\"",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "[테스트 5] [복사본]sample 삭제하기",
+      "check_item": "삭제 + 토스트",
+      "detail": "토스트 알림: \"활동이 삭제 되었습니다.\"",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "복사하기": {
+      "found": true,
+      "status": "PASS"
+    },
+    "공개하기": {
+      "toast_found": true,
+      "toast_message": "활동이 공개 되었습니다.",
+      "status": "PASS"
+    },
+    "비공개하기": {
+      "toast_found": true,
+      "toast_message": "활동이 비공개 되었습니다.",
+      "status": "PASS"
+    },
+    "삭제하기": {
+      "toast_found": true,
+      "toast_message": "활동이 삭제 되었습니다.",
+      "status": "PASS"
+    },
+    "[복사본]sample_삭제하기": {
+      "toast_found": true,
+      "toast_message": "활동이 삭제 되었습니다.",
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

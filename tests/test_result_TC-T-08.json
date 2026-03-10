@@ -1,0 +1,115 @@
+{
+  "test_name": "TC-T-08: 단원 초기화 동작 확인",
+  "test_date": "2026-03-09 14:55:24",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "선생님 입장하기",
+      "check_item": "진입 페이지",
+      "detail": "선생님 입장하기 버튼 클릭 > 메인 페이지 이동",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "교과서 메뉴 클릭",
+      "check_item": "LNB 메뉴",
+      "detail": "교과서 메뉴 클릭 > 단원 리스트 노출",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "단원 리스트 확인",
+      "check_item": "단원 노출",
+      "detail": "단원 텍스트 존재 확인 (found: True)",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "재구성하기 버튼 클릭",
+      "check_item": "버튼 클릭",
+      "detail": "첫 번째 단원 재구성하기 버튼 클릭 (8개 중)",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "재구성 페이지 확인",
+      "check_item": "페이지 전환",
+      "detail": "URL 변경 및 키워드 확인 (재구성, 저장, 초기화)",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "임시저장 삭제",
+      "check_item": "삭제 동작",
+      "detail": "임시저장 삭제 버튼 클릭 > 모달 확인 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 7,
+      "action": "임시저장 버튼 클릭",
+      "check_item": "저장 동작",
+      "detail": "임시저장 버튼 클릭 > 데이터 생성 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 8,
+      "action": "초기화 버튼 클릭",
+      "check_item": "버튼 클릭",
+      "detail": "초기화 버튼 클릭 (1개 발견)",
+      "status": "PASS"
+    },
+    {
+      "step": 9,
+      "action": "초기화 확인",
+      "check_item": "모달 + 토스트",
+      "detail": "초기화 확인 모달 클릭 > 17초 후 토스트 알림 확인 (초기화가 완료되었습니다.)",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "단원_리스트": {
+      "found": true,
+      "status": "PASS"
+    },
+    "재구성하기_버튼": {
+      "found": true,
+      "count": 8,
+      "status": "PASS"
+    },
+    "재구성_페이지": {
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/textbook/detail/49565",
+      "found_keywords": [
+        "재구성",
+        "저장",
+        "초기화"
+      ],
+      "status": "PASS"
+    },
+    "임시저장_삭제": {
+      "found": true,
+      "count": 1,
+      "modal_clicked": true,
+      "status": "PASS"
+    },
+    "임시저장_버튼": {
+      "found": true,
+      "count": 1,
+      "status": "PASS"
+    },
+    "초기화_버튼": {
+      "found": true,
+      "count": 1,
+      "status": "PASS"
+    },
+    "초기화_확인": {
+      "modal_clicked": true,
+      "toast_found": true,
+      "toast_message": "초기화가 완료되었습니다.",
+      "wait_seconds": 17,
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

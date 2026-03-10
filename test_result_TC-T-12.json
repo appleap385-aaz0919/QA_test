@@ -1,0 +1,82 @@
+{
+  "test_name": "TC-T-12: 모둠 활동 선택 > 활동보드판 진입 동작 확인",
+  "test_date": "2026-03-10 13:08:32",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "진입 페이지 > 선생님 입장",
+      "check_item": "메인 페이지 진입",
+      "detail": "URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/class/0/dashboard",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "모둠활동 메뉴 클릭",
+      "check_item": "모둠활동 리스트 페이지",
+      "detail": "모둠활동 메뉴 클릭 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "작성하기 버튼 클릭",
+      "check_item": "활동 만들기 팝업",
+      "detail": "활동 만들기 팝업 표시",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "활동 생성 > 새 창 열림",
+      "check_item": "모둠활동창 새 창",
+      "detail": "새 창 URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2577?isNew=true",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "새 창 닫기",
+      "check_item": "모둠활동창 닫기",
+      "detail": "모둠활동창 닫기 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "sample 활동 클릭 > 새 창 열림",
+      "check_item": "모둠활동창 새 창 재진입",
+      "detail": "새 창 URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2577?isNew=true",
+      "status": "PASS"
+    },
+    {
+      "step": 7,
+      "action": "열린 창 닫기",
+      "check_item": "모둠활동창 닫기",
+      "detail": "재진입한 모둠활동창 닫기 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 8,
+      "action": "sample 활동 삭제",
+      "check_item": "삭제 + 토스트",
+      "detail": "토스트 알림: \"활동이 삭제 되었습니다.\"",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "활동_생성_새창": {
+      "found": true,
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2577?isNew=true",
+      "status": "PASS"
+    },
+    "활동_재진입_새창": {
+      "found": true,
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2577?isNew=true",
+      "status": "PASS"
+    },
+    "활동_삭제": {
+      "toast_found": true,
+      "toast_message": "활동이 삭제 되었습니다.",
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

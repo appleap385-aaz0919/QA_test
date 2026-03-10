@@ -1,0 +1,89 @@
+{
+  "test_name": "TC-T-05: 단원 상세 보기 테스트",
+  "test_date": "2026-03-03 19:48:55",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "선생님 입장하기",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "교과서 메뉴 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "단원 리스트 노출 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "단원 상세 보기 버튼 클릭",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "모듈 리스트 노출 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "모듈 클릭 및 뷰어 새 창 확인",
+      "status": "PASS"
+    },
+    {
+      "step": 7,
+      "action": "콘텐츠 정상 노출 확인",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "단원_번호_오름차순": {
+      "chapter_numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "is_ascending": true,
+      "status": "PASS"
+    },
+    "단원_리스트": {
+      "found": true,
+      "status": "PASS"
+    },
+    "단원_상세_보기_버튼": {
+      "found": true,
+      "count": 8,
+      "status": "PASS"
+    },
+    "모듈_리스트": {
+      "found_keywords": [
+        "모듈",
+        "Reading",
+        "Talk",
+        "Watch"
+      ],
+      "viewer_link_boxes": 23,
+      "status": "PASS"
+    },
+    "뷰어_새창": {
+      "found": true,
+      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4903/49565/970804/2802999/entrance?mode=default",
+      "status": "PASS"
+    },
+    "콘텐츠_노출": {
+      "viewer_container": 1,
+      "content_area": 24,
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

@@ -1,0 +1,322 @@
+{
+  "teacher": {
+    "T01": {
+      "name": "홈_기본노출",
+      "result": "PASS",
+      "error": null
+    },
+    "T02": {
+      "name": "홈_출석체크",
+      "result": "PASS",
+      "error": null
+    },
+    "T03": {
+      "name": "홈_과제",
+      "result": "PASS",
+      "error": null
+    },
+    "T04": {
+      "name": "홈_인사이트카드",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "T05": {
+      "name": "홈_수업시작",
+      "result": "PASS",
+      "error": null
+    },
+    "T06": {
+      "name": "교과서_수업시작",
+      "result": "PASS",
+      "error": null
+    },
+    "T07": {
+      "name": "교과서_단원상세",
+      "result": "PASS",
+      "error": null
+    },
+    "T08": {
+      "name": "교과서_재구성",
+      "result": "PASS",
+      "error": null
+    },
+    "T09": {
+      "name": "모둠활동_작성하기",
+      "result": "PASS",
+      "error": null
+    },
+    "T10": {
+      "name": "모둠활동_리스트",
+      "result": "PASS",
+      "error": null
+    },
+    "T11": {
+      "name": "과제_리스트",
+      "result": "PASS",
+      "error": null
+    },
+    "T12": {
+      "name": "과제_작성하기",
+      "result": "PASS",
+      "error": null
+    },
+    "T13": {
+      "name": "과제_AIWriting",
+      "result": "PASS",
+      "error": null
+    },
+    "T14": {
+      "name": "AI평가_평가지",
+      "result": "PASS",
+      "error": null
+    },
+    "T15": {
+      "name": "AI평가_배포",
+      "result": "PASS",
+      "error": null
+    },
+    "T16": {
+      "name": "AI평가_리포트",
+      "result": "PASS",
+      "error": null
+    },
+    "T17": {
+      "name": "AI평가_모니터링",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "T18": {
+      "name": "AI학습관_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "T19": {
+      "name": "AI학습관_현황",
+      "result": "PASS",
+      "error": null
+    },
+    "T20": {
+      "name": "오답노트_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "T21": {
+      "name": "학생_학급분석",
+      "result": "PASS",
+      "error": null
+    },
+    "T22": {
+      "name": "학생_현황",
+      "result": "PASS",
+      "error": null
+    },
+    "T23": {
+      "name": "학생_AI평어",
+      "result": "PASS",
+      "error": null
+    },
+    "T24": {
+      "name": "학생_누가기록",
+      "result": "PASS",
+      "error": null
+    },
+    "T25": {
+      "name": "학생_칭찬",
+      "result": "PASS",
+      "error": null
+    },
+    "T26": {
+      "name": "내자료_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "T27": {
+      "name": "내자료_추가",
+      "result": "PASS",
+      "error": null
+    },
+    "T28": {
+      "name": "공통_알림",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "T29": {
+      "name": "공통_설정",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "T30": {
+      "name": "공통_채팅",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "T31": {
+      "name": "공통_게시판",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "T32": {
+      "name": "AI보조교사_챗봇",
+      "result": "PASS",
+      "error": null
+    },
+    "T33": {
+      "name": "수업뷰어_페이지이동",
+      "result": "FAIL",
+      "error": "'bool' object can't be awaited"
+    },
+    "T34": {
+      "name": "수업뷰어_집중모드",
+      "result": "FAIL",
+      "error": "'bool' object can't be awaited"
+    },
+    "T35": {
+      "name": "수업뷰어_학습공유",
+      "result": "FAIL",
+      "error": "'bool' object can't be awaited"
+    },
+    "T36": {
+      "name": "수업뷰어_도구",
+      "result": "FAIL",
+      "error": "'bool' object can't be awaited"
+    }
+  },
+  "student": {
+    "S01": {
+      "name": "홈_기본노출",
+      "result": "PASS",
+      "error": null
+    },
+    "S02": {
+      "name": "홈_인사이트카드",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S03": {
+      "name": "홈_프로필",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S04": {
+      "name": "홈_칭찬",
+      "result": "PASS",
+      "error": null
+    },
+    "S05": {
+      "name": "홈_수업시작",
+      "result": "PASS",
+      "error": null
+    },
+    "S06": {
+      "name": "홈_기분",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S07": {
+      "name": "홈_학습목표",
+      "result": "PASS",
+      "error": null
+    },
+    "S08": {
+      "name": "교과서_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "S09": {
+      "name": "교과서_단원상세",
+      "result": "PASS",
+      "error": null
+    },
+    "S10": {
+      "name": "교과서_진도",
+      "result": "PASS",
+      "error": null
+    },
+    "S11": {
+      "name": "과제_리스트",
+      "result": "PASS",
+      "error": null
+    },
+    "S12": {
+      "name": "과제_제출",
+      "result": "PASS",
+      "error": null
+    },
+    "S13": {
+      "name": "모둠활동_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "S14": {
+      "name": "AI평가_응시",
+      "result": "PASS",
+      "error": null
+    },
+    "S15": {
+      "name": "AI평가_풀이확인",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S16": {
+      "name": "AI평가_추천",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S17": {
+      "name": "AI학습관_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "S18": {
+      "name": "AI학습관_채점",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S19": {
+      "name": "오답노트_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "S20": {
+      "name": "오답노트_다시풀기",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S21": {
+      "name": "학습결과_기본",
+      "result": "PASS",
+      "error": null
+    },
+    "S22": {
+      "name": "공통_알림",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S23": {
+      "name": "공통_설정",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S24": {
+      "name": "공통_채팅",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S25": {
+      "name": "공통_게시판",
+      "result": "FAIL",
+      "error": "테스트 실패"
+    },
+    "S26": {
+      "name": "AI튜터_챗봇",
+      "result": "PASS",
+      "error": null
+    },
+    "S27": {
+      "name": "수업뷰어_페이지이동",
+      "result": "FAIL",
+      "error": "'bool' object can't be awaited"
+    }
+  },
+  "timestamp": "2026-02-20T09:50:21.070019"
+}
