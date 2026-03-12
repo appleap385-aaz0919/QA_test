@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-09: 모둠활동 작성하기 - 타일형",
-  "test_date": "2026-03-10 13:00:02",
+  "test_date": "2026-03-11 18:38:21",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {
@@ -63,7 +63,7 @@
       "step": 9,
       "action": "새 창 확인",
       "check_item": "새 창 제목",
-      "detail": "새 창 URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2573?isNew=true, 제목: 동아출판 AI 디지털 교육자료",
+      "detail": "새 창 URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2586?isNew=true, 제목: 동아출판 AI 디지털 교육자료",
       "status": "PASS"
     }
   ],
@@ -91,7 +91,7 @@
     },
     "새창_sample": {
       "found": true,
-      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2573?isNew=true",
+      "url": "https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2586?isNew=true",
       "title": "동아출판 AI 디지털 교육자료",
       "status": "PASS"
     }

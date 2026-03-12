@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-05: 단원 상세 보기 테스트",
-  "test_date": "2026-03-10 12:52:41",
+  "test_date": "2026-03-11 18:33:28",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {
@@ -75,7 +75,7 @@
     },
     "뷰어_새창": {
       "found": true,
-      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4903/49565/970804/2802999/entrance?mode=default",
+      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4918/49727/975106/2816528/entrance?mode=default",
       "status": "PASS"
     },
     "콘텐츠_노출": {

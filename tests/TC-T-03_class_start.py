@@ -16,16 +16,15 @@ import asyncio
 from playwright.async_api import async_playwright, TimeoutError
 from datetime import datetime
 import json
+from qa_utils import fast_page_wait, wait_for_new_page, get_browser_config, MAX_WAIT
 
-LOAD_WAIT = 5
-MAX_WAIT = 60
+SCREENSHOT_DIR = "screenshots"
 
 
 async def test_class_start():
     """TC-T-03: 수업 시작하기 버튼 테스트"""
 
     TEST_URL = "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon"
-    SCREENSHOT_DIR = "screenshots"
 
     results = {
         "test_name": "TC-T-03: 수업 시작하기 버튼 테스트",
@@ -38,7 +37,7 @@ async def test_class_start():
     }
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=300)
+        browser = await p.chromium.launch(**get_browser_config())
         context = await browser.new_context(viewport={"width": 1920, "height": 1080})
 
         # 마이크 권한 미리 허용
@@ -53,26 +52,13 @@ async def test_class_start():
             print("=" * 60)
 
             await entry_page.goto(TEST_URL, timeout=60000)
-            await entry_page.wait_for_load_state("networkidle")
-            await asyncio.sleep(LOAD_WAIT)
+            await fast_page_wait(entry_page)
 
             teacher_btn = entry_page.locator("button").filter(has_text="선생님 입장하기")
-            async with context.expect_page(timeout=MAX_WAIT * 1000) as new_page_info:
-                await teacher_btn.click()
-                print("   선생님 입장하기 클릭")
+            main_page = await wait_for_new_page(context, lambda: teacher_btn.click(), MAX_WAIT * 1000)
 
-            main_page = await new_page_info.value
-
-            try:
-                await main_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-            except TimeoutError:
-                pass
-
-            await asyncio.sleep(LOAD_WAIT)
-            try:
-                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
-            except TimeoutError:
-                pass
+            # 추가 안정화
+            await asyncio.sleep(1)
 
             print(f"   메인 페이지 URL: {main_page.url}")
             results["steps"].append({"step": 1, "action": "선생님 입장하기", "status": "PASS"})
@@ -104,25 +90,15 @@ async def test_class_start():
 
             if start_btn_count > 0:
                 try:
-                    # 새 창이 열리는 것을 대기
-                    async with context.expect_page(timeout=MAX_WAIT * 1000) as class_page_info:
-                        await start_btn.first.click()
-                        print("   버튼 클릭 완료")
-
-                    class_page = await class_page_info.value
+                    class_page = await wait_for_new_page(context, lambda: start_btn.first.click(), MAX_WAIT * 1000)
                     print(f"   새 창 감지됨: {class_page.url}")
 
-                    # Step 4: 새 창 로딩 대기
+                    # Step 4: 수업 뷰어 페이지 로딩 확인
                     print("\n" + "=" * 60)
                     print("Step 4: 수업 뷰어 페이지 로딩 확인")
                     print("=" * 60)
 
-                    try:
-                        await class_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-                    except TimeoutError:
-                        print("   networkidle 대기 시간 초과 (계속 진행)")
-
-                    await asyncio.sleep(LOAD_WAIT)
+                    await asyncio.sleep(1)
                     await class_page.screenshot(path=f"{SCREENSHOT_DIR}/tc03_02_class_page.png", full_page=True)
 
                     # Step 5: 수업 뷰어 페이지 요소 확인
@@ -133,7 +109,6 @@ async def test_class_start():
                     viewer_url = class_page.url
                     print(f"   현재 URL: {viewer_url}")
 
-                    # 수업 뷰어 페이지 주요 요소 확인
                     viewer_elements = {
                         "뷰어_컨테이너": "[class*='viewer'], [class*='Viewer'], [class*='player'], [class*='Player']",
                         "메뉴_또는_네비게이션": "[class*='menu'], [class*='nav'], [class*='sidebar']",
@@ -147,7 +122,6 @@ async def test_class_start():
                         viewer_checks[elem_name] = {"found": found, "count": count, "status": "PASS" if found else "CHECK"}
                         print(f"   [{elem_name}] {'발견' if found else '미발견'} ({count}개)")
 
-                    # URL 패턴 확인 (뷰어 페이지인지)
                     is_viewer_page = "viewer" in viewer_url.lower() or "player" in viewer_url.lower() or "class" in viewer_url.lower()
                     viewer_checks["뷰어_URL_패턴"] = {"found": is_viewer_page, "url": viewer_url, "status": "PASS" if is_viewer_page else "CHECK"}
                     print(f"   [뷰어 URL 패턴] {'OK' if is_viewer_page else 'CHECK'}")
@@ -158,7 +132,6 @@ async def test_class_start():
                     results["steps"].append({"step": 4, "action": "수업 뷰어 페이지 로딩", "status": "PASS"})
                     results["steps"].append({"step": 5, "action": "뷰어 페이지 요소 확인", "status": "PASS"})
 
-                    # 최종 스크린샷
                     await class_page.screenshot(path=f"{SCREENSHOT_DIR}/tc03_03_final.png", full_page=True)
 
                 except Exception as e:
@@ -190,8 +163,8 @@ async def test_class_start():
                 json.dump(results, f, ensure_ascii=False, indent=2)
             print(f"\n   결과 저장: test_result_TC-T-03.json")
 
-            print("\n10초 후 종료...")
-            await asyncio.sleep(10)
+            print("\n2초 후 종료...")
+            await asyncio.sleep(2)
 
         except Exception as e:
             print(f"\n에러: {e}")

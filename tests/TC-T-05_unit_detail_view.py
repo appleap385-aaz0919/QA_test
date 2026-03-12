@@ -20,16 +20,15 @@ from playwright.async_api import async_playwright, TimeoutError
 from datetime import datetime
 import json
 import re
+from qa_utils import fast_page_wait, wait_for_new_page, get_browser_config, MAX_WAIT
 
-LOAD_WAIT = 5
-MAX_WAIT = 60
+SCREENSHOT_DIR = "screenshots"
 
 
 async def test_unit_detail_view():
     """TC-T-05: 단원 상세 보기 테스트"""
 
     TEST_URL = "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon"
-    SCREENSHOT_DIR = "screenshots"
 
     results = {
         "test_name": "TC-T-05: 단원 상세 보기 테스트",
@@ -42,12 +41,9 @@ async def test_unit_detail_view():
     }
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=300)
+        browser = await p.chromium.launch(**get_browser_config())
         context = await browser.new_context(viewport={"width": 1920, "height": 1080})
-
-        # 마이크 권한 미리 허용
         await context.grant_permissions(["microphone"])
-
         entry_page = await context.new_page()
 
         try:
@@ -57,26 +53,11 @@ async def test_unit_detail_view():
             print("=" * 60)
 
             await entry_page.goto(TEST_URL, timeout=60000)
-            await entry_page.wait_for_load_state("networkidle")
-            await asyncio.sleep(LOAD_WAIT)
+            await fast_page_wait(entry_page)
 
             teacher_btn = entry_page.locator("button").filter(has_text="선생님 입장하기")
-            async with context.expect_page(timeout=MAX_WAIT * 1000) as new_page_info:
-                await teacher_btn.click()
-                print("   선생님 입장하기 클릭")
-
-            main_page = await new_page_info.value
-
-            try:
-                await main_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-            except TimeoutError:
-                pass
-
-            await asyncio.sleep(LOAD_WAIT)
-            try:
-                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
-            except TimeoutError:
-                pass
+            main_page = await wait_for_new_page(context, lambda: teacher_btn.click(), MAX_WAIT * 1000)
+            await asyncio.sleep(1)
 
             print(f"   메인 페이지 URL: {main_page.url}")
             results["steps"].append({"step": 1, "action": "선생님 입장하기", "status": "PASS"})
@@ -90,7 +71,7 @@ async def test_unit_detail_view():
             await textbook_menu.click()
             print("   교과서 메뉴 클릭")
 
-            await asyncio.sleep(LOAD_WAIT)
+            await asyncio.sleep(0.5)
             await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc05_01_textbook_menu.png", full_page=True)
             results["steps"].append({"step": 2, "action": "교과서 메뉴 클릭", "status": "PASS"})
 
@@ -103,7 +84,6 @@ async def test_unit_detail_view():
             has_chapter = "단원" in page_text or "Lesson" in page_text
             print(f"   단원 텍스트 존재: {has_chapter}")
 
-            # 단원 번호 오름차순 체크 ('평가' 제외)
             lesson_pattern = re.compile(r'Lesson\s*(\d+)', re.IGNORECASE)
             lines = page_text.split('\n')
             pure_chapter_numbers = []
@@ -135,7 +115,6 @@ async def test_unit_detail_view():
             print("Step 4: '단원 상세 보기' 버튼 클릭")
             print("=" * 60)
 
-            # span 요소에서 '단원 상세 보기' 찾기
             detail_span = main_page.locator("span:has-text('단원 상세 보기')")
             detail_btn_count = await detail_span.count()
             print(f"   '단원 상세 보기' span 요소: {detail_btn_count}개")
@@ -147,11 +126,10 @@ async def test_unit_detail_view():
             }
 
             if detail_btn_count > 0:
-                # span의 부모 요소(버튼) 클릭 또는 span 직접 클릭
                 await detail_span.first.click()
                 print("   단원 상세 보기 클릭")
 
-                await asyncio.sleep(LOAD_WAIT)
+                await asyncio.sleep(0.5)
                 await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc05_02_detail_view.png", full_page=True)
                 results["steps"].append({"step": 4, "action": "단원 상세 보기 버튼 클릭", "status": "PASS"})
 
@@ -160,13 +138,8 @@ async def test_unit_detail_view():
                 print("Step 5: 모듈 리스트 노출 확인")
                 print("=" * 60)
 
-                page_text = await main_page.locator("body").inner_text()
-                module_keywords = ["모듈", "Module", "차시", "Listening", "Speaking", "Reading", "Writing", "Talk", "Watch"]
-                found_modules = [kw for kw in module_keywords if kw in page_text]
-
-                # 스크롤하며 모든 ViewerLinkBox 로드
-                print("   스크롤하며 모든 모듈 로드 중...")
-                for _ in range(10):
+                # 스크롤하며 모든 ViewerLinkBox 로드 (최적화)
+                for _ in range(5):
                     await main_page.evaluate("""() => {
                         const elements = document.querySelectorAll('*');
                         elements.forEach(el => {
@@ -179,9 +152,12 @@ async def test_unit_detail_view():
                             }
                         });
                     }""")
-                    await asyncio.sleep(0.3)
+                    await asyncio.sleep(0.1)
 
-                await asyncio.sleep(1)
+                page_text = await main_page.locator("body").inner_text()
+                module_keywords = ["모듈", "Module", "차시", "Listening", "Speaking", "Reading", "Writing", "Talk", "Watch"]
+                found_modules = [kw for kw in module_keywords if kw in page_text]
+
                 viewer_link_boxes = await main_page.locator(".ViewerLinkBox").count()
                 print(f"   모듈 관련 키워드: {found_modules}")
                 print(f"   ViewerLinkBox (모듈) 개수: {viewer_link_boxes}개")
@@ -199,25 +175,15 @@ async def test_unit_detail_view():
                 print("Step 6: 모듈 클릭 > 뷰어 새 창 확인")
                 print("=" * 60)
 
-                # ViewerLinkBox 클래스 버튼 찾기
                 view_btn = main_page.locator(".ViewerLinkBox")
                 view_btn_count = await view_btn.count()
                 print(f"   ViewerLinkBox 버튼: {view_btn_count}개")
 
                 if view_btn_count > 0:
                     try:
-                        async with context.expect_page(timeout=MAX_WAIT * 1000) as viewer_page_info:
-                            await view_btn.first.click()
-                            print("   '보기' 버튼 클릭")
+                        viewer_page = await wait_for_new_page(context, lambda: view_btn.first.click(), MAX_WAIT * 1000)
+                        print("   '보기' 버튼 클릭")
 
-                        viewer_page = await viewer_page_info.value
-
-                        try:
-                            await viewer_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-                        except TimeoutError:
-                            print("   networkidle 대기 시간 초과 (계속 진행)")
-
-                        await asyncio.sleep(LOAD_WAIT)
                         viewer_url = viewer_page.url
                         print(f"   뷰어 URL: {viewer_url}")
 
@@ -287,8 +253,8 @@ async def test_unit_detail_view():
                 json.dump(results, f, ensure_ascii=False, indent=2)
             print(f"\n   결과 저장: test_result_TC-T-05.json")
 
-            print("\n10초 후 종료...")
-            await asyncio.sleep(10)
+            print("\n2초 후 종료...")
+            await asyncio.sleep(2)
 
         except Exception as e:
             print(f"\n에러: {e}")
@@ -296,10 +262,6 @@ async def test_unit_detail_view():
             traceback.print_exc()
             results["overall_result"] = "ERROR"
             results["errors"].append(str(e))
-            try:
-                await entry_page.screenshot(path=f"{SCREENSHOT_DIR}/tc05_error.png")
-            except:
-                pass
 
         finally:
             await browser.close()

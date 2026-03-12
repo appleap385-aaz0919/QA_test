@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-07: 재구성 배포 동작 확인",
-  "test_date": "2026-03-09 14:40:15",
+  "test_date": "2026-03-12 09:35:16",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {
@@ -30,8 +30,8 @@
     },
     {
       "step": 6,
-      "action": "임시저장 삭제 진행",
-      "status": "PASS"
+      "action": "임시저장 삭제 버튼 확인",
+      "status": "SKIP"
     },
     {
       "step": 7,
@@ -69,10 +69,8 @@
       "status": "PASS"
     },
     "임시저장_삭제": {
-      "found": true,
-      "count": 1,
-      "modal_clicked": true,
-      "status": "PASS"
+      "found": false,
+      "status": "SKIP"
     },
     "임시저장_버튼": {
       "found": true,

@@ -19,16 +19,15 @@ import asyncio
 from playwright.async_api import async_playwright, TimeoutError
 from datetime import datetime
 import json
+from qa_utils import fast_page_wait, wait_for_new_page, check_element_exists, get_browser_config, MAX_WAIT
 
-LOAD_WAIT = 5
-MAX_WAIT = 60
+SCREENSHOT_DIR = "screenshots"
 
 
 async def test_teacher_home_entry():
     """TC-T-01: 교사 홈 진입 테스트 - 새 창 처리"""
 
     TEST_URL = "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon"
-    SCREENSHOT_DIR = "screenshots"
 
     # 확인해야 할 요소 목록
     EXPECTED_ELEMENTS = {
@@ -110,7 +109,7 @@ async def test_teacher_home_entry():
     }
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=300)
+        browser = await p.chromium.launch(**get_browser_config())
         context = await browser.new_context(viewport={"width": 1920, "height": 1080})
         entry_page = await context.new_page()
 
@@ -121,8 +120,7 @@ async def test_teacher_home_entry():
             print("=" * 60)
 
             await entry_page.goto(TEST_URL, timeout=60000)
-            await entry_page.wait_for_load_state("networkidle")
-            await asyncio.sleep(LOAD_WAIT)
+            await fast_page_wait(entry_page)
 
             await entry_page.screenshot(path=f"{SCREENSHOT_DIR}/tc01_01_entry_page.png", full_page=True)
             print(f"   URL: {entry_page.url}")
@@ -135,61 +133,25 @@ async def test_teacher_home_entry():
 
             teacher_btn = entry_page.locator("button").filter(has_text="선생님 입장하기")
 
-            # 새 창이 열리는 것을 대기
-            async with context.expect_page(timeout=MAX_WAIT * 1000) as new_page_info:
-                await teacher_btn.click()
-                print("   버튼 클릭 완료")
-
-            # 새 창 가져오기
-            main_page = await new_page_info.value
+            # 새 창이 열리는 것을 대기 (최적화된 함수 사용)
+            main_page = await wait_for_new_page(context, lambda: teacher_btn.click(), MAX_WAIT * 1000)
             print(f"   새 창 감지됨: {main_page.url}")
 
-            # Step 3: 새 창 로딩 대기
-            print("\n" + "=" * 60)
-            print("Step 3: 새 창 로딩 대기")
-            print("=" * 60)
-
-            try:
-                await main_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-                print("   networkidle 완료")
-            except TimeoutError:
-                print("   networkidle 대기 시간 초과 (계속 진행)")
-
-            await asyncio.sleep(LOAD_WAIT)
-
-            # 로딩 indicator 사라질 때까지 대기
-            try:
-                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
-                print("   로딩 indicator 사라짐")
-            except TimeoutError:
-                print("   로딩 indicator 대기 시간 초과")
+            # 추가 안정화 대기 (최소화)
+            await asyncio.sleep(1)
 
             await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc01_02_main_page.png", full_page=True)
             print(f"   현재 URL: {main_page.url}")
             results["steps"].append({"step": 2, "action": "선생님 입장하기 클릭 및 새 창 진입", "status": "PASS"})
 
-            # Step 4: 홈 화면 요소 확인
+            # Step 3: 홈 화면 요소 확인
             print("\n" + "=" * 60)
-            print("Step 4: 홈 화면 요소 확인")
+            print("Step 3: 홈 화면 요소 확인")
             print("=" * 60)
 
             for element_name, element_info in EXPECTED_ELEMENTS.items():
                 print(f"\n   [{element_name}] 확인 중...")
-                found = False
-                found_selector = None
-
-                for selector in element_info["selectors"]:
-                    try:
-                        count = await main_page.locator(selector).count()
-                        if count > 0:
-                            visible_count = await main_page.locator(selector + ":visible").count()
-                            if visible_count > 0:
-                                found = True
-                                found_selector = selector
-                                print(f"      발견: {selector} ({visible_count}개)")
-                                break
-                    except:
-                        continue
+                found, found_selector = await check_element_exists(main_page, element_info["selectors"])
 
                 check_result = {
                     "found": found,
@@ -198,7 +160,9 @@ async def test_teacher_home_entry():
                     "status": "PASS" if found else "FAIL"
                 }
 
-                if not found:
+                if found:
+                    print(f"      발견: {found_selector}")
+                else:
                     print(f"      미발견")
                     if element_info["required"]:
                         results["overall_result"] = "FAIL"
@@ -250,8 +214,8 @@ async def test_teacher_home_entry():
                 json.dump(results, f, ensure_ascii=False, indent=2)
             print(f"\n   결과 저장: test_result_TC-T-01.json")
 
-            print("\n10초 후 종료...")
-            await asyncio.sleep(10)
+            print("\n2초 후 종료...")
+            await asyncio.sleep(2)
 
         except Exception as e:
             print(f"\n에러: {e}")

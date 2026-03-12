@@ -1,0 +1,367 @@
+﻿"""
+TC-T-06: 재구성하기 테스트
+- LNB '교과서' 메뉴 > 단원 리스트 > 재구성 하기 버튼 클릭 > 임시저장 삭제(있으면) > 임시저장 > 미리보기 > 뷰어
+
+테스트 시나리오:
+1. 선생님 입장하기
+2. LNB '교과서' 메뉴 클릭
+3. 단원 리스트 노출 확인
+4. 첫 번째 단원 '재구성하기' 버튼 클릭
+5. 재구성 페이지 확인
+6. 임시저장 삭제 버튼 있으면 삭제 (모달에서도 삭제 클릭)
+7. 임시저장 버튼 클릭 > 데이터 생성 확인
+8. 미리보기 버튼 클릭 > 뷰어 확인
+
+"""
+
+import asyncio
+from playwright.async_api import async_playwright, TimeoutError
+from datetime import datetime
+import json
+
+LOAD_WAIT = 1
+MAX_WAIT = 60
+SCREENSHOT_DIR = "screenshots"
+results = {
+    "test_name": "TC-T-06: 재구성하기 테스트",
+    "test_date": "",
+    "url": "",
+    "steps": [],
+    "checks": {},
+    "overall_result": "PASS",
+    "errors": []
+}
+async def test_reconstruction():
+    """TC-T-06: 재구성하기 테스트"""
+    TEST_URL = "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon"
+    results["test_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    results["url"] = TEST_URL
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False, slow_mo=20)
+        context = await browser.new_context(viewport={"width": 1920, "height": 1080})
+        await context.grant_permissions(["microphone"])
+        entry_page = await context.new_page()
+        try:
+            # Step 1: 진입 페이지 > 선생님 입장하기
+            print("=" * 60)
+            print("Step 1: 진입 페이지 > 선생님 입장하기")
+            print("=" * 60)
+            await entry_page.goto(TEST_URL, timeout=60000)
+            await entry_page.wait_for_load_state("networkidle")
+            await asyncio.sleep(LOAD_WAIT)
+            teacher_btn = entry_page.locator("button").filter(has_text="선생님 입장하기")
+            async with context.expect_page(timeout=MAX_WAIT * 1000) as new_page_info:
+                await teacher_btn.click()
+                print("   선생님 입장하기 클릭")
+            main_page = await new_page_info.value
+            try:
+                await main_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
+            except TimeoutError:
+                pass
+            await asyncio.sleep(LOAD_WAIT)
+            try:
+                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
+            except TimeoutError:
+                pass
+            print(f"   메인 페이지 URL: {main_page.url}")
+            results["steps"].append({"step": 1, "action": "선생님 입장하기", "status": "PASS"})
+            # Step 2: LNB '교과서' 메뉴 클릭
+            print("\n" + "=" * 60)
+            print("Step 2: LNB '교과서' 메뉴 클릭")
+            print("=" * 60)
+            textbook_menu = main_page.locator("text=/교과서/").first
+            await textbook_menu.click()
+            print("   교과서 메뉴 클릭")
+            await asyncio.sleep(LOAD_WAIT)
+            await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc06_01_textbook_menu.png", full_page=True)
+            results["steps"].append({"step": 2, "action": "교과서 메뉴 클릭", "status": "PASS"})
+            # Step 3: 단원 리스트 노출 확인
+            print("\n" + "=" * 60)
+            print("Step 3: 단원 리스트 노출 확인")
+            print("=" * 60)
+            page_text = await main_page.locator("body").inner_text()
+            has_chapter = "단원" in page_text or "Lesson" in page_text
+            print(f"   단원 텍스트 존재: {has_chapter}")
+            results["checks"]["단원_리스트"] = {"found": has_chapter, "status": "PASS" if has_chapter else "FAIL"}
+            results["steps"].append({"step": 3, "action": "단원 리스트 노출 확인", "status": "PASS" if has_chapter else "FAIL"})
+            # Step 4: 첫 번째 단원 '재구성하기' 버튼 클릭
+            print("\n" + "=" * 60)
+            print("Step 4: 첫 번째 단원 '재구성하기' 버튼 클릭")
+            print("=" * 60)
+            # 재구성하기 버튼 찾기 (span 요소 확인)
+            recon_selectors = [
+                "span:has-text('재구성하기')",
+                "span:has-text('재구성')",
+            ]
+            recon_btn_count = 0
+            recon_btn = None
+            for selector in recon_selectors:
+                count = await main_page.locator(selector).count()
+                if count > 0:
+                    recon_btn_count = count
+                    recon_btn = main_page.locator(selector).first
+                    print(f"   재구성하기 버튼: {recon_btn_count}개 (selector: {selector})")
+                    break
+            if recon_btn_count > 0:
+                await recon_btn.click()
+                print("   재구성하기 버튼 클릭")
+                await asyncio.sleep(LOAD_WAIT)
+                await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc06_02_recon_page.png", full_page=True)
+                results["checks"]["재구성하기_버튼"] = {"found": True, "count": recon_btn_count, "status": "PASS"}
+                results["steps"].append({"step": 4, "action": "재구성하기 버튼 클릭", "status": "PASS"})
+                # Step 5: 재구성 페이지 확인
+                print("\n" + "=" * 60)
+                print("Step 5: 재구성 페이지 확인")
+                print("=" * 60)
+                recon_url = main_page.url
+                print(f"   현재 URL: {recon_url}")
+                page_text = await main_page.locator("body").inner_text()
+                recon_keywords = ["재구성", "모듈", "차시", "저장", "미리보기"]
+                found_keywords = [kw for kw in recon_keywords if kw in page_text]
+                print(f"   발견된 키워드: {found_keywords}")
+                has_recon_page = len(found_keywords) >= 2
+                results["checks"]["재구성_페이지"] = {
+                    "url": recon_url,
+                    "found_keywords": found_keywords,
+                    "status": "PASS" if has_recon_page else "CHECK"
+                }
+                results["steps"].append({"step": 5, "action": "재구성 페이지 확인", "status": "PASS" if has_recon_page else "CHECK"})
+                # Step 6: 임시저장 삭제 버튼 확인 및 삭제
+                print("\n" + "=" * 60)
+                print("Step 6: 임시저장 삭제 버튼 확인 및 삭제")
+                print("=" * 60)
+                # 임시저장 삭제 버튼 찾기
+                delete_selectors = [
+                    "button:has-text('임시저장 삭제')",
+                    "button:has-text('삭제')",
+                    "span:has-text('임시저장 삭제')",
+                    "span:has-text('삭제')",
+                    "[class*='delete']",
+                    "[class*='Delete']",
+                ]
+                delete_btn_count = 0
+                delete_btn = None
+                for selector in delete_selectors:
+                    count = await main_page.locator(selector).count()
+                    if count > 0:
+                        delete_btn_count = count
+                        delete_btn = main_page.locator(selector).first
+                        print(f"   임시저장 삭제 버튼: {delete_btn_count}개 (selector: {selector})")
+                        break
+                if delete_btn_count > 0:
+                    # 모달이 있으면 먼저 닫기
+                    modal_overlay = main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog")
+                    modal_count = await modal_overlay.count()
+                    if modal_count > 0:
+                        print(f"   기존 모달 발견: {modal_count}개, 먼저 닫기 시도")
+                        try:
+                            await main_page.keyboard.press("Escape")
+                            await asyncio.sleep(0.5)
+                            print("   ESC로 모달 닫기 시도")
+                            await main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog").wait_for(state="hidden", timeout=3000)
+                            print("   ESC로 모달 닫힘 확인")
+                        except:
+                            print("   ESC로 모달 닫기 실패, 다른 방법 시도")
+                            try:
+                                await main_page.mouse.click("body", position={"x": 10, "y": 10})
+                                await asyncio.sleep(0.5)
+                                print("   바깥쪽 클릭으로 모달 닫기 시도")
+                            except:
+                                pass
+
+                    # 삭제 버튼 클릭
+                    await delete_btn.click()
+                    print("   임시저장 삭제 버튼 클릭")
+                    await asyncio.sleep(1)
+
+                    # 모달이 나타날 때까지 대기
+                    try:
+                        await main_page.wait_for_selector(".modal-content, .modal-dialog, .modal", state="visible", timeout=5000)
+                        print("   모달 팝업 감지됨")
+                        await asyncio.sleep(0.5)
+                    except TimeoutError:
+                        print("   모달 팝업이 감지되지 않음")
+
+                    # 모달 확인 버튼 클릭 (삭제 확인)
+                    modal_delete_selectors = [
+                        "button.btn.fill.loading-color-black.secondary.full:has-text('확인')",
+                        "button[class*='loading-color-black'][class*='secondary']:has-text('확인')",
+                        "button:has-text('삭제'):not(:has-text('취소'))",
+                        "button:has-text('확인')",
+                        "button:has-text('예')",
+                        "button:has-text('Yes')",
+                    ]
+                    modal_clicked = False
+                    for selector in modal_delete_selectors:
+                        try:
+                            modal_btn = main_page.locator(selector).first
+                            if await modal_btn.is_visible(timeout=2000):
+                                await modal_btn.click()
+                                print(f"   모달 확인 버튼 클릭 (selector: {selector})")
+                                modal_clicked = True
+                                await asyncio.sleep(2)
+                                break
+                        except:
+                            continue
+                    results["checks"]["임시저장_삭제"] = {
+                        "found": True,
+                        "count": delete_btn_count,
+                        "modal_clicked": modal_clicked,
+                        "status": "PASS"
+                    }
+                    results["steps"].append({"step": 6, "action": "임시저장 삭제 진행", "status": "PASS"})
+                else:
+                    print("   임시저장 삭제 버튼 없음 - 건너뜀")
+                    results["checks"]["임시저장_삭제"] = {"found": False, "status": "SKIP"}
+                    results["steps"].append({"step": 6, "action": "임시저장 삭제 버튼 확인", "status": "SKIP"})
+                # Step 7: 임시저장 버튼 클릭
+                print("\n" + "=" * 60)
+                print("Step 7: 임시저장 버튼 클릭")
+                print("=" * 60)
+                # 모달이 있으면 닫기
+                modal_overlay = main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog")
+                modal_count = await modal_overlay.count()
+                if modal_count > 0:
+                    print(f"   모달 발견: {modal_count}개, 닫기 시도")
+                    try:
+                        await main_page.keyboard.press("Escape")
+                        await asyncio.sleep(0.5)
+                        print("   ESC로 모달 닫기 시도")
+                        await main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog").wait_for(state="hidden", timeout=3000)
+                        print("   ESC로 모달 닫힘 확인")
+                    except:
+                        # ESC로 안 닫히면 바깥쪽 클릭
+                        try:
+                            await main_page.mouse.click("body", position={"x": 10, "y": 10})
+                            await asyncio.sleep(0.5)
+                            print("   바깥쪽 클릭으로 모달 닫기 시도")
+                        except:
+                            pass
+                # 임시저장 버튼 찾기
+                save_btn_selectors = [
+                    "button:has-text('임시저장')",
+                    "button:has-text('저장')",
+                    "span:has-text('임시저장')",
+                ]
+                save_btn_count = 0
+                save_btn = None
+                for selector in save_btn_selectors:
+                    count = await main_page.locator(selector).count()
+                    if count > 0:
+                        save_btn_count = count
+                        save_btn = main_page.locator(selector).first
+                        print(f"   임시저장 버튼: {count}개 (selector: {selector})")
+                        break
+                if save_btn_count > 0 and save_btn:
+                    await save_btn.click()
+                    print("   임시저장 버튼 클릭")
+                    await asyncio.sleep(2)
+                    results["checks"]["임시저장_버튼"] = {"found": True, "count": save_btn_count, "status": "PASS"}
+                    results["steps"].append({"step": 7, "action": "임시저장 버튼 클릭", "status": "PASS"})
+                else:
+                    results["checks"]["임시저장_버튼"] = {"found": False, "status": "CHECK"}
+                    results["steps"].append({"step": 7, "action": "임시저장 버튼 찾기", "status": "CHECK"})
+                # Step 8: 미리보기 버튼 클릭 > 뷰어 확인
+                print("\n" + "=" * 60)
+                print("Step 8: 미리보기 버튼 클릭 > 뷰어 확인")
+                print("=" * 60)
+                preview_btn_selectors = [
+                    "button:has-text('미리보기')",
+                    "button:has-text('미리 보기')",
+                    "span:has-text('미리보기'), span:has-text('미리 보기')",
+                ]
+                preview_btn_count = 0
+                preview_btn = None
+                for selector in preview_btn_selectors:
+                    count = await main_page.locator(selector).count()
+                    if count > 0:
+                        preview_btn_count = count
+                        preview_btn = main_page.locator(selector).first
+                        print(f"   미리보기 버튼: {count}개 (selector: {selector})")
+                        break
+                if preview_btn_count > 0 and preview_btn:
+                    try:
+                        async with context.expect_page(timeout=MAX_WAIT * 1000) as viewer_page_info:
+                            await preview_btn.click()
+                            print("   미리보기 버튼 클릭")
+                        viewer_page = await viewer_page_info.value
+                        try:
+                            await viewer_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
+                        except TimeoutError:
+                            print("   networkidle 대기 시간 초과 (계속 진행)")
+                        await asyncio.sleep(LOAD_WAIT)
+                        viewer_url = viewer_page.url
+                        print(f"   뷰어 URL: {viewer_url}")
+                        # 뷰어 URL 패턴 확인
+                        is_viewer_url = "viewer" in viewer_url.lower() or "v-web" in viewer_url.lower() or "player" in viewer_url.lower()
+                        print(f"   뷰어 URL 패턴: {'OK' if is_viewer_url else 'CHECK'}")
+                        # 콘텐츠 노출 확인
+                        viewer_content = await viewer_page.locator("body").inner_text()
+                        content_keywords = ["차시", "페이지", "학습", "목차"]
+                        found_content_keywords = [kw for kw in content_keywords if kw in viewer_content]
+                        print(f"   뷰어 콘텐츠 키워드: {found_content_keywords}")
+                        results["checks"]["미리보기_뷰어"] = {
+                            "found": True,
+                            "url": viewer_url,
+                            "content_keywords": found_content_keywords,
+                            "status": "PASS" if is_viewer_url else "CHECK"
+                        }
+                        results["steps"].append({"step": 8, "action": "미리보기 뷰어 확인", "status": "PASS"})
+                        await viewer_page.screenshot(path=f"{SCREENSHOT_DIR}/tc06_03_viewer.png", full_page=True)
+                        await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc06_04_after_preview.png", full_page=True)
+                    except Exception as e:
+                        print(f"   뷰어 열기 실패: {e}")
+                        results["checks"]["미리보기_뷰어"] = {"found": False, "error": str(e), "status": "CHECK"}
+                        results["steps"].append({"step": 8, "action": "미리보기 뷰어 확인", "status": "CHECK"})
+                else:
+                    print("   미리보기 버튼을 찾을 수 없음")
+                    results["checks"]["미리보기_버튼"] = {"found": False, "status": "CHECK"}
+                    results["steps"].append({"step": 8, "action": "미리보기 버튼 찾기", "status": "CHECK"})
+            else:
+                print("   재구성하기 버튼을 찾을 수 없음")
+                results["checks"]["재구성하기_버튼"] = {"found": False, "status": "FAIL"}
+                results["overall_result"] = "FAIL"
+                results["errors"].append("재구성하기 버튼을 찾을 수 없음")
+                results["steps"].append({"step": 4, "action": "재구성하기 버튼 클릭", "status": "FAIL"})
+            # 결과 요약
+            print("\n" + "=" * 60)
+            print("테스트 결과 요약")
+            print("=" * 60)
+            print(f"   테스트명: {results['test_name']}")
+            print(f"   실행일시: {results['test_date']}")
+            print(f"   최종 결과: {results['overall_result']}")
+            print("\n   [체크 항목별 결과]")
+            for check_name, check_result in results["checks"].items():
+                status = check_result.get("status", "UNKNOWN")
+                print(f"      [{status}] {check_name}")
+            if results["errors"]:
+                print("\n   [에러 목록]")
+                for err in results["errors"]:
+                    print(f"      - {err}")
+            with open("test_result_TC-T-06.json", "w", encoding="utf-8") as f:
+                json.dump(results, f, ensure_ascii=False, indent=2)
+            print(f"\n   결과 저장: test_result_TC-T-06.json")
+            print("\n10초 후 종료...")
+            await asyncio.sleep(2)
+        except Exception as e:
+            print(f"\n에러: {e}")
+            import traceback
+            traceback.print_exc()
+            results["overall_result"] = "ERROR"
+            results["errors"].append(str(e))
+            try:
+                await entry_page.screenshot(path=f"{SCREENSHOT_DIR}/tc06_error.png")
+            except:
+                pass
+        finally:
+            await browser.close()
+    return results
+
+
+if __name__ == "__main__":
+    import os
+    os.makedirs("screenshots", exist_ok=True)
+    print("=" * 60)
+    print("TC-T-06: 재구성하기 테스트 시작")
+    print("=" * 60)
+    asyncio.run(test_reconstruction())

@@ -12,37 +12,33 @@ TC-T-07: 재구성 배포 동작 확인
 7. 임시저장 버튼 클릭 > 데이터 생성 확인
 8. 교과서 배포 버튼 클릭
 9. 모달 팝업에서 확인 버튼 클릭
-
 """
 
 import asyncio
 from playwright.async_api import async_playwright, TimeoutError
 from datetime import datetime
 import json
+from qa_utils import fast_page_wait, wait_for_new_page, get_browser_config, MAX_WAIT
 
-LOAD_WAIT = 5
-MAX_WAIT = 60
 SCREENSHOT_DIR = "screenshots"
-
-results = {
-    "test_name": "TC-T-07: 재구성 배포 동작 확인",
-    "test_date": "",
-    "url": "",
-    "steps": [],
-    "checks": {},
-    "overall_result": "PASS",
-    "errors": []
-}
 
 
 async def test_reconstruction_deploy():
     """TC-T-07: 재구성 배포 동작 확인"""
     TEST_URL = "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon"
-    results["test_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    results["url"] = TEST_URL
+
+    results = {
+        "test_name": "TC-T-07: 재구성 배포 동작 확인",
+        "test_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "url": TEST_URL,
+        "steps": [],
+        "checks": {},
+        "overall_result": "PASS",
+        "errors": []
+    }
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=300)
+        browser = await p.chromium.launch(**get_browser_config())
         context = await browser.new_context(viewport={"width": 1920, "height": 1080})
         await context.grant_permissions(["microphone"])
         entry_page = await context.new_page()
@@ -52,25 +48,13 @@ async def test_reconstruction_deploy():
             print("=" * 60)
             print("Step 1: 진입 페이지 > 선생님 입장하기")
             print("=" * 60)
+
             await entry_page.goto(TEST_URL, timeout=60000)
-            await entry_page.wait_for_load_state("networkidle")
-            await asyncio.sleep(LOAD_WAIT)
+            await fast_page_wait(entry_page)
 
             teacher_btn = entry_page.locator("button").filter(has_text="선생님 입장하기")
-            async with context.expect_page(timeout=MAX_WAIT * 1000) as new_page_info:
-                await teacher_btn.click()
-                print("   선생님 입장하기 클릭")
-
-            main_page = await new_page_info.value
-            try:
-                await main_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-            except TimeoutError:
-                pass
-            await asyncio.sleep(LOAD_WAIT)
-            try:
-                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
-            except TimeoutError:
-                pass
+            main_page = await wait_for_new_page(context, lambda: teacher_btn.click(), MAX_WAIT * 1000)
+            await asyncio.sleep(1)
 
             print(f"   메인 페이지 URL: {main_page.url}")
             results["steps"].append({"step": 1, "action": "선생님 입장하기", "status": "PASS"})
@@ -82,7 +66,7 @@ async def test_reconstruction_deploy():
             textbook_menu = main_page.locator("text=/교과서/").first
             await textbook_menu.click()
             print("   교과서 메뉴 클릭")
-            await asyncio.sleep(LOAD_WAIT)
+            await asyncio.sleep(0.5)
             await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc07_01_textbook_menu.png", full_page=True)
             results["steps"].append({"step": 2, "action": "교과서 메뉴 클릭", "status": "PASS"})
 
@@ -100,10 +84,7 @@ async def test_reconstruction_deploy():
             print("\n" + "=" * 60)
             print("Step 4: 첫 번째 단원 '재구성하기' 버튼 클릭")
             print("=" * 60)
-            recon_selectors = [
-                "span:has-text('재구성하기')",
-                "span:has-text('재구성')",
-            ]
+            recon_selectors = ["span:has-text('재구성하기')", "span:has-text('재구성')"]
             recon_btn_count = 0
             recon_btn = None
             for selector in recon_selectors:
@@ -111,13 +92,13 @@ async def test_reconstruction_deploy():
                 if count > 0:
                     recon_btn_count = count
                     recon_btn = main_page.locator(selector).first
-                    print(f"   재구성하기 버튼: {recon_btn_count}개 (selector: {selector})")
+                    print(f"   재구성하기 버튼: {recon_btn_count}개")
                     break
 
             if recon_btn_count > 0:
                 await recon_btn.click()
                 print("   재구성하기 버튼 클릭")
-                await asyncio.sleep(LOAD_WAIT)
+                await asyncio.sleep(0.5)
                 await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc07_02_recon_page.png", full_page=True)
                 results["checks"]["재구성하기_버튼"] = {"found": True, "count": recon_btn_count, "status": "PASS"}
                 results["steps"].append({"step": 4, "action": "재구성하기 버튼 클릭", "status": "PASS"})
@@ -133,25 +114,14 @@ async def test_reconstruction_deploy():
                 found_keywords = [kw for kw in recon_keywords if kw in page_text]
                 print(f"   발견된 키워드: {found_keywords}")
                 has_recon_page = len(found_keywords) >= 2
-                results["checks"]["재구성_페이지"] = {
-                    "url": recon_url,
-                    "found_keywords": found_keywords,
-                    "status": "PASS" if has_recon_page else "CHECK"
-                }
+                results["checks"]["재구성_페이지"] = {"url": recon_url, "found_keywords": found_keywords, "status": "PASS" if has_recon_page else "CHECK"}
                 results["steps"].append({"step": 5, "action": "재구성 페이지 확인", "status": "PASS" if has_recon_page else "CHECK"})
 
                 # Step 6: 임시저장 삭제 버튼 확인 및 삭제
                 print("\n" + "=" * 60)
                 print("Step 6: 임시저장 삭제 버튼 확인 및 삭제")
                 print("=" * 60)
-                delete_selectors = [
-                    "button:has-text('임시저장 삭제')",
-                    "button:has-text('삭제')",
-                    "span:has-text('임시저장 삭제')",
-                    "span:has-text('삭제')",
-                    "[class*='delete']",
-                    "[class*='Delete']",
-                ]
+                delete_selectors = ["button:has-text('임시저장 삭제')", "button:has-text('삭제')", "span:has-text('임시저장 삭제')"]
                 delete_btn_count = 0
                 delete_btn = None
                 for selector in delete_selectors:
@@ -159,71 +129,36 @@ async def test_reconstruction_deploy():
                     if count > 0:
                         delete_btn_count = count
                         delete_btn = main_page.locator(selector).first
-                        print(f"   임시저장 삭제 버튼: {delete_btn_count}개 (selector: {selector})")
+                        print(f"   임시저장 삭제 버튼: {delete_btn_count}개")
                         break
 
                 if delete_btn_count > 0:
-                    # 모달이 있으면 먼저 닫기
-                    modal_overlay = main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog")
-                    modal_count = await modal_overlay.count()
-                    if modal_count > 0:
-                        print(f"   기존 모달 발견: {modal_count}개, 먼저 닫기 시도")
-                        try:
-                            await main_page.keyboard.press("Escape")
-                            await asyncio.sleep(0.5)
-                            print("   ESC로 모달 닫기 시도")
-                            await main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog").wait_for(state="hidden", timeout=3000)
-                            print("   ESC로 모달 닫힘 확인")
-                        except:
-                            print("   ESC로 모달 닫기 실패, 다른 방법 시도")
-                            try:
-                                await main_page.mouse.click("body", position={"x": 10, "y": 10})
-                                await asyncio.sleep(0.5)
-                                print("   바깥쪽 클릭으로 모달 닫기 시도")
-                            except:
-                                pass
+                    try:
+                        await main_page.keyboard.press("Escape")
+                        await asyncio.sleep(0.3)
+                    except:
+                        pass
 
-                    # 삭제 버튼 클릭
                     await delete_btn.click()
                     print("   임시저장 삭제 버튼 클릭")
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
 
-                    # 모달이 나타날 때까지 대기
-                    try:
-                        await main_page.wait_for_selector(".modal-content, .modal-dialog, .modal", state="visible", timeout=5000)
-                        print("   모달 팝업 감지됨")
-                        await asyncio.sleep(0.5)
-                    except TimeoutError:
-                        print("   모달 팝업이 감지되지 않음")
-
-                    # 모달 확인 버튼 클릭 (삭제 확인)
-                    modal_delete_selectors = [
-                        "button.btn.fill.loading-color-black.secondary.full:has-text('확인')",
-                        "button[class*='loading-color-black'][class*='secondary']:has-text('확인')",
-                        "button:has-text('삭제'):not(:has-text('취소'))",
-                        "button:has-text('확인')",
-                        "button:has-text('예')",
-                        "button:has-text('Yes')",
-                    ]
+                    # 모달 확인 버튼 클릭
+                    modal_delete_selectors = ["button:has-text('확인')", "button:has-text('삭제'):not(:has-text('취소'))"]
                     modal_clicked = False
                     for selector in modal_delete_selectors:
                         try:
                             modal_btn = main_page.locator(selector).first
-                            if await modal_btn.is_visible(timeout=2000):
+                            if await modal_btn.is_visible(timeout=1000):
                                 await modal_btn.click()
-                                print(f"   모달 확인 버튼 클릭 (selector: {selector})")
+                                print(f"   모달 확인 버튼 클릭")
                                 modal_clicked = True
-                                await asyncio.sleep(2)
+                                await asyncio.sleep(0.5)
                                 break
                         except:
                             continue
 
-                    results["checks"]["임시저장_삭제"] = {
-                        "found": True,
-                        "count": delete_btn_count,
-                        "modal_clicked": modal_clicked,
-                        "status": "PASS"
-                    }
+                    results["checks"]["임시저장_삭제"] = {"found": True, "modal_clicked": modal_clicked, "status": "PASS"}
                     results["steps"].append({"step": 6, "action": "임시저장 삭제 진행", "status": "PASS"})
                 else:
                     print("   임시저장 삭제 버튼 없음 - 건너뜀")
@@ -234,30 +169,13 @@ async def test_reconstruction_deploy():
                 print("\n" + "=" * 60)
                 print("Step 7: 임시저장 버튼 클릭")
                 print("=" * 60)
-                # 모달이 있으면 닫기
-                modal_overlay = main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog")
-                modal_count = await modal_overlay.count()
-                if modal_count > 0:
-                    print(f"   모달 발견: {modal_count}개, 닫기 시도")
-                    try:
-                        await main_page.keyboard.press("Escape")
-                        await asyncio.sleep(0.5)
-                        print("   ESC로 모달 닫기 시도")
-                        await main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog").wait_for(state="hidden", timeout=3000)
-                        print("   ESC로 모달 닫힘 확인")
-                    except:
-                        try:
-                            await main_page.mouse.click("body", position={"x": 10, "y": 10})
-                            await asyncio.sleep(0.5)
-                            print("   바깥쪽 클릭으로 모달 닫기 시도")
-                        except:
-                            pass
+                try:
+                    await main_page.keyboard.press("Escape")
+                    await asyncio.sleep(0.3)
+                except:
+                    pass
 
-                save_btn_selectors = [
-                    "button:has-text('임시저장')",
-                    "button:has-text('저장')",
-                    "span:has-text('임시저장')",
-                ]
+                save_btn_selectors = ["button:has-text('임시저장')", "button:has-text('저장')"]
                 save_btn_count = 0
                 save_btn = None
                 for selector in save_btn_selectors:
@@ -265,13 +183,13 @@ async def test_reconstruction_deploy():
                     if count > 0:
                         save_btn_count = count
                         save_btn = main_page.locator(selector).first
-                        print(f"   임시저장 버튼: {count}개 (selector: {selector})")
+                        print(f"   임시저장 버튼: {count}개")
                         break
 
                 if save_btn_count > 0 and save_btn:
                     await save_btn.click()
                     print("   임시저장 버튼 클릭")
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(0.5)
                     results["checks"]["임시저장_버튼"] = {"found": True, "count": save_btn_count, "status": "PASS"}
                     results["steps"].append({"step": 7, "action": "임시저장 버튼 클릭", "status": "PASS"})
                 else:
@@ -282,29 +200,13 @@ async def test_reconstruction_deploy():
                 print("\n" + "=" * 60)
                 print("Step 8: 교과서 배포 버튼 클릭")
                 print("=" * 60)
-                # 모달이 있으면 닫기
-                modal_overlay = main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog")
-                modal_count = await modal_overlay.count()
-                if modal_count > 0:
-                    print(f"   모달 발견: {modal_count}개, 닫기 시도")
-                    try:
-                        await main_page.keyboard.press("Escape")
-                        await asyncio.sleep(0.5)
-                        await main_page.locator(".modal-backdrop, .modal-open, .modal-content, .modal-dialog").wait_for(state="hidden", timeout=3000)
-                        print("   ESC로 모달 닫힘 확인")
-                    except:
-                        try:
-                            await main_page.mouse.click("body", position={"x": 10, "y": 10})
-                            await asyncio.sleep(0.5)
-                        except:
-                            pass
+                try:
+                    await main_page.keyboard.press("Escape")
+                    await asyncio.sleep(0.3)
+                except:
+                    pass
 
-                deploy_btn_selectors = [
-                    "button:has-text('배포')",
-                    "button:has-text('교과서 배포')",
-                    "span:has-text('배포')",
-                    "span:has-text('교과서 배포')",
-                ]
+                deploy_btn_selectors = ["button:has-text('배포')", "button:has-text('교과서 배포')"]
                 deploy_btn_count = 0
                 deploy_btn = None
                 for selector in deploy_btn_selectors:
@@ -312,13 +214,13 @@ async def test_reconstruction_deploy():
                     if count > 0:
                         deploy_btn_count = count
                         deploy_btn = main_page.locator(selector).first
-                        print(f"   배포 버튼: {count}개 (selector: {selector})")
+                        print(f"   배포 버튼: {count}개")
                         break
 
                 if deploy_btn_count > 0 and deploy_btn:
                     await deploy_btn.click()
                     print("   배포 버튼 클릭")
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(0.5)
                     await main_page.screenshot(path=f"{SCREENSHOT_DIR}/tc07_03_deploy_modal.png", full_page=True)
                     results["checks"]["배포_버튼"] = {"found": True, "count": deploy_btn_count, "status": "PASS"}
                     results["steps"].append({"step": 8, "action": "배포 버튼 클릭", "status": "PASS"})
@@ -327,31 +229,16 @@ async def test_reconstruction_deploy():
                     print("\n" + "=" * 60)
                     print("Step 9: 모달 팝업에서 확인 버튼 클릭")
                     print("=" * 60)
-                    # 모달이 나타날 때까지 대기
-                    try:
-                        await main_page.wait_for_selector(".modal-content, .modal-dialog, .modal", state="visible", timeout=5000)
-                        print("   배포 확인 모달 팝업 감지됨")
-                        await asyncio.sleep(0.5)
-                    except TimeoutError:
-                        print("   모달 팝업이 감지되지 않음")
-
-                    # 모달 확인 버튼 클릭
-                    modal_confirm_selectors = [
-                        "button.btn.fill.loading-color-black.secondary.full:has-text('확인')",
-                        "button[class*='loading-color-black'][class*='secondary']:has-text('확인')",
-                        "button:has-text('확인')",
-                        "button:has-text('배포')",
-                        "button:has-text('예')",
-                    ]
+                    modal_confirm_selectors = ["button:has-text('확인')", "button:has-text('배포')"]
                     modal_clicked = False
                     for selector in modal_confirm_selectors:
                         try:
                             modal_btn = main_page.locator(selector).first
-                            if await modal_btn.is_visible(timeout=2000):
+                            if await modal_btn.is_visible(timeout=1000):
                                 await modal_btn.click()
-                                print(f"   모달 확인 버튼 클릭 (selector: {selector})")
+                                print(f"   모달 확인 버튼 클릭")
                                 modal_clicked = True
-                                await asyncio.sleep(2)
+                                await asyncio.sleep(0.5)
                                 break
                         except:
                             continue
@@ -396,8 +283,8 @@ async def test_reconstruction_deploy():
                 json.dump(results, f, ensure_ascii=False, indent=2)
             print(f"\n   결과 저장: test_result_TC-T-07.json")
 
-            print("\n10초 후 종료...")
-            await asyncio.sleep(10)
+            print("\n2초 후 종료...")
+            await asyncio.sleep(2)
 
         except Exception as e:
             print(f"\n에러: {e}")
@@ -405,10 +292,6 @@ async def test_reconstruction_deploy():
             traceback.print_exc()
             results["overall_result"] = "ERROR"
             results["errors"].append(str(e))
-            try:
-                await entry_page.screenshot(path=f"{SCREENSHOT_DIR}/tc07_error.png")
-            except:
-                pass
         finally:
             await browser.close()
 

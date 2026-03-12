@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-04: 교과서 보기 버튼 테스트",
-  "test_date": "2026-03-03 17:22:45",
+  "test_date": "2026-03-12 09:33:35",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {
@@ -59,12 +59,12 @@
     },
     "뷰어_새창": {
       "found": true,
-      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4903/49564/970803/2802998/entrance?mode=default",
+      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/viewer/4903/49564?mode=default",
       "status": "PASS"
     },
     "콘텐츠_노출": {
       "viewer_container": 1,
-      "content_area": 2,
+      "content_area": 1,
       "status": "PASS"
     }
   },

@@ -1,0 +1,120 @@
+{
+  "test_name": "TC-T-13: 모둠 활동 선택 > 활동 보드판 > 게시글 작성 동작 확인",
+  "test_date": "2026-03-12 10:00:57",
+  "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
+  "steps": [
+    {
+      "step": 1,
+      "action": "진입 페이지 > 선생님 입장하기",
+      "check_item": "메인 페이지 진입",
+      "detail": "URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/class/0/dashboard",
+      "status": "PASS"
+    },
+    {
+      "step": 2,
+      "action": "모둠활동 메뉴 클릭",
+      "check_item": "모둠활동 리스트 페이지 이동",
+      "detail": "모둠활동 메뉴 클릭 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 3,
+      "action": "작성하기 버튼 클릭",
+      "check_item": "활동 만들기 팝업 표시",
+      "detail": "활동 만들기 팝업 표시됨",
+      "status": "PASS"
+    },
+    {
+      "step": 4,
+      "action": "활동 이름 'sample' 입력 > 타일형 선택 > 만들기 클릭",
+      "check_item": "새 창으로 모둠활동창 열림",
+      "detail": "URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2599?isNew=true",
+      "status": "PASS"
+    },
+    {
+      "step": 5,
+      "action": "활동 설정 패널 닫기",
+      "check_item": "패널 닫기",
+      "detail": "패널 닫기 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 6,
+      "action": "우측 하단 '게시글 만들기' 버튼 클릭",
+      "check_item": "게시글 작성 패널 열림",
+      "detail": "플로팅 버튼 클릭 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 7,
+      "action": "게시글 제목 'title', 내용 'Input contents' 입력",
+      "check_item": "제목/내용 입력 완료",
+      "detail": "제목: True, 내용: True",
+      "status": "PASS"
+    },
+    {
+      "step": 8,
+      "action": "게시글 컬러 노란색 선택",
+      "check_item": "노란색 선택 완료",
+      "detail": "노란색 컬러 선택 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 9,
+      "action": "만들기 버튼 클릭",
+      "check_item": "게시글 생성",
+      "detail": "만들기 버튼 클릭 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 10,
+      "action": "토스트 알림 확인",
+      "check_item": "'활동 게시글이 생성되었습니다.'",
+      "detail": "토스트: \"활동 게시글이 생성되었습니다.\"",
+      "status": "PASS"
+    },
+    {
+      "step": 11,
+      "action": "보드에 게시글 생성 확인",
+      "check_item": "보드에 게시글 존재",
+      "detail": "게시글이 보드에 생성됨",
+      "status": "PASS"
+    },
+    {
+      "step": 12,
+      "action": "창 닫기",
+      "check_item": "활동 창 닫기",
+      "detail": "활동 창 닫기 완료",
+      "status": "PASS"
+    },
+    {
+      "step": 13,
+      "action": "sample 활동 삭제",
+      "check_item": "삭제 + 토스트 알림",
+      "detail": "토스트: \"활동이 삭제 되었습니다.\"",
+      "status": "PASS"
+    }
+  ],
+  "checks": {
+    "게시글_만들기_버튼": {
+      "found": true,
+      "status": "PASS"
+    },
+    "토스트_알림": {
+      "found": true,
+      "message": "활동 게시글이 생성되었습니다.",
+      "status": "PASS"
+    },
+    "게시글_보드_생성": {
+      "found": true,
+      "status": "PASS"
+    },
+    "활동_삭제": {
+      "toast_found": true,
+      "toast_message": "활동이 삭제 되었습니다.",
+      "status": "PASS"
+    }
+  },
+  "overall_result": "PASS",
+  "errors": []
+}

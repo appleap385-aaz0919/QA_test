@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-13: 모둠 활동 선택 > 활동 보드판 > 게시글 작성 동작 확인",
-  "test_date": "2026-03-10 13:16:20",
+  "test_date": "2026-03-11 18:48:48",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {
@@ -28,7 +28,7 @@
       "step": 4,
       "action": "활동 이름 'sample' 입력 > 타일형 선택 > 만들기 클릭",
       "check_item": "새 창으로 모둠활동창 열림",
-      "detail": "URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2578?isNew=true",
+      "detail": "URL: https://eng-mn1-mid-2.aidt.ai/lms-web/lms/activity/board/2591?isNew=true",
       "status": "PASS"
     },
     {

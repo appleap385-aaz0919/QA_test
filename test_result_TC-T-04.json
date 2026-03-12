@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-04: 교과서 보기 버튼 테스트",
-  "test_date": "2026-03-10 12:50:22",
+  "test_date": "2026-03-11 18:31:42",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {

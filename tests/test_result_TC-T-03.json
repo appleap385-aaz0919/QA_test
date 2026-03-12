@@ -1,6 +1,6 @@
 {
   "test_name": "TC-T-03: 수업 시작하기 버튼 테스트",
-  "test_date": "2026-03-03 15:43:05",
+  "test_date": "2026-03-12 09:33:03",
   "url": "https://www.aidt.ai/lms-web/dev/entry-aidt-2025?school=m&subject=eng&grade=2&semester=all&authorName=yoon",
   "steps": [
     {
@@ -36,18 +36,18 @@
     },
     "새_창_열림": {
       "found": true,
-      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/viewer/4903/49565/970805/2803001?mode=default",
+      "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4903/49565/970804/2802999/entrance?mode=default",
       "status": "PASS"
     },
     "뷰어_페이지_요소": {
       "뷰어_컨테이너": {
         "found": true,
-        "count": 3,
+        "count": 1,
         "status": "PASS"
       },
       "메뉴_또는_네비게이션": {
         "found": true,
-        "count": 4,
+        "count": 3,
         "status": "PASS"
       },
       "컨텐츠_영역": {
@@ -56,9 +56,9 @@
         "status": "PASS"
       },
       "뷰어_URL_패턴": {
-        "found": true,
-        "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/viewer/4903/49565/970805/2803001?mode=default",
-        "status": "PASS"
+        "found": false,
+        "url": "https://eng-mn1-mid-2.aidt.ai/v-web/index.html#/assessment/4903/49565/970804/2802999/entrance?mode=default",
+        "status": "CHECK"
       }
     }
   },

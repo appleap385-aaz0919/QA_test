@@ -22,9 +22,8 @@ import asyncio
 from playwright.async_api import async_playwright, TimeoutError
 from datetime import datetime
 import json
+from qa_utils import fast_page_wait, wait_for_new_page, get_browser_config, MAX_WAIT
 
-LOAD_WAIT = 5
-MAX_WAIT = 60
 SCREENSHOT_DIR = "screenshots"
 
 results = {
@@ -148,7 +147,7 @@ async def test_group_activity_post_create():
     results["url"] = TEST_URL
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=300)
+        browser = await p.chromium.launch(**get_browser_config())
         context = await browser.new_context(viewport={"width": 1920, "height": 1080})
         await context.grant_permissions(["microphone"])
         entry_page = await context.new_page()
@@ -162,24 +161,12 @@ async def test_group_activity_post_create():
             print("=" * 60)
 
             await entry_page.goto(TEST_URL, timeout=60000)
-            await entry_page.wait_for_load_state("networkidle")
-            await asyncio.sleep(LOAD_WAIT)
+            await fast_page_wait(entry_page)
 
             teacher_btn = entry_page.locator("button").filter(has_text="선생님 입장하기")
-            async with context.expect_page(timeout=MAX_WAIT * 1000) as new_page_info:
-                await teacher_btn.click()
-                print("   선생님 입장하기 클릭")
-
-            main_page = await new_page_info.value
-            try:
-                await main_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-            except TimeoutError:
-                pass
-            await asyncio.sleep(LOAD_WAIT)
-            try:
-                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
-            except TimeoutError:
-                pass
+            main_page = await wait_for_new_page(context, lambda: teacher_btn.click(), MAX_WAIT * 1000)
+            print("   선생님 입장하기 클릭")
+            await asyncio.sleep(1)
 
             print(f"   메인 페이지 URL: {main_page.url}")
 
@@ -202,7 +189,7 @@ async def test_group_activity_post_create():
             group_menu = main_page.locator("text=/모둠 활동/").first
             await group_menu.click()
             print("   모둠활동 메뉴 클릭")
-            await asyncio.sleep(LOAD_WAIT)
+            await asyncio.sleep(0.5)
 
             results["steps"].append({
                 "step": 2,
@@ -223,7 +210,7 @@ async def test_group_activity_post_create():
             write_btn = main_page.locator("button:has-text('작성하기')").first
             await write_btn.click()
             print("   작성하기 버튼 클릭")
-            await asyncio.sleep(LOAD_WAIT)
+            await asyncio.sleep(0.5)
 
             try:
                 await main_page.wait_for_selector(".modal-content, .modal-dialog, .modal", state="visible", timeout=5000)
@@ -258,16 +245,8 @@ async def test_group_activity_post_create():
             print("   타일형 선택")
 
             create_btn = main_page.locator("button:has-text('만들기')").first
-            async with context.expect_page(timeout=MAX_WAIT * 1000) as activity_page_info:
-                await create_btn.click()
-                print("   만들기 버튼 클릭")
-
-            activity_page = await activity_page_info.value
-            try:
-                await activity_page.wait_for_load_state("networkidle", timeout=MAX_WAIT * 1000)
-            except TimeoutError:
-                pass
-            await asyncio.sleep(LOAD_WAIT)
+            activity_page = await wait_for_new_page(context, lambda: create_btn.click(), MAX_WAIT * 1000)
+            print("   만들기 버튼 클릭")
 
             print(f"   활동 페이지 URL: {activity_page.url}")
 
@@ -299,7 +278,7 @@ async def test_group_activity_post_create():
             for selector in panel_close_selectors:
                 try:
                     close_btn = activity_page.locator(selector).first
-                    if await close_btn.is_visible(timeout=3000):
+                    if await close_btn.is_visible(timeout=1000):
                         await close_btn.click()
                         print(f"   패널 닫기 버튼 클릭 (selector: {selector})")
                         panel_closed = True
@@ -311,9 +290,8 @@ async def test_group_activity_post_create():
                 # ESC 키로 패널 닫기 시도
                 await activity_page.keyboard.press("Escape")
                 print("   ESC 키로 패널 닫기 시도")
-                await asyncio.sleep(1)
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(0.5)
 
             results["steps"].append({
                 "step": 5,
@@ -343,7 +321,7 @@ async def test_group_activity_post_create():
             for selector in post_btn_selectors:
                 try:
                     post_btn = activity_page.locator(selector).first
-                    if await post_btn.is_visible(timeout=3000):
+                    if await post_btn.is_visible(timeout=1000):
                         await post_btn.click()
                         print(f"   게시글 만들기 버튼 클릭 (selector: {selector})")
                         post_btn_found = True
@@ -354,7 +332,7 @@ async def test_group_activity_post_create():
             if not post_btn_found:
                 print("   게시글 만들기 버튼을 찾을 수 없음")
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(0.5)
 
             results["checks"]["게시글_만들기_버튼"] = {"found": post_btn_found, "status": "PASS" if post_btn_found else "CHECK"}
             results["steps"].append({
@@ -411,71 +389,29 @@ async def test_group_activity_post_create():
                 print("Step 7: 게시글 작성 - 제목 'title', 내용 'Input contents'")
                 print("=" * 60)
 
-                # 제목 입력
+                # 제목 입력 (바로 input[type='text'] 사용)
                 title_found = False
-                title_input_selectors = [
-                    "input[placeholder*='제목']",
-                    "input[placeholder*='title']",
-                    ".post-title-input",
-                    "[class*='title'] input",
-                    "input.title",
-                    ".card-add input[type='text']",
-                    ".activity-float-card-add input[type='text']",
-                ]
+                try:
+                    title_input = activity_page.locator("input[type='text']").first
+                    if await title_input.is_visible(timeout=1000):
+                        await title_input.click()
+                        await title_input.fill("title")
+                        print("   제목 'title' 입력 완료")
+                        title_found = True
+                except:
+                    pass
 
-                for selector in title_input_selectors:
-                    try:
-                        title_input = activity_page.locator(selector).first
-                        if await title_input.is_visible(timeout=2000):
-                            await title_input.click()
-                            await asyncio.sleep(0.3)
-                            await title_input.fill("title")
-                            print(f"   제목 'title' 입력 (selector: {selector})")
-                            title_found = True
-                            break
-                    except:
-                        continue
-
-                if not title_found:
-                    # 모든 input 검색
-                    all_inputs = activity_page.locator("input[type='text']")
-                    input_count = await all_inputs.count()
-                    print(f"   텍스트 input 총 {input_count}개 검색 중...")
-                    for i in range(input_count):
-                        inp = all_inputs.nth(i)
-                        try:
-                            if await inp.is_visible():
-                                await inp.click()
-                                await asyncio.sleep(0.3)
-                                await inp.fill("title")
-                                print(f"   [{i}] 제목 입력 완료")
-                                title_found = True
-                                break
-                        except:
-                            continue
-
-                # 내용 입력
+                # 내용 입력 (바로 textarea 사용)
                 content_found = False
-                content_input_selectors = [
-                    "textarea[placeholder*='내용']",
-                    "textarea[placeholder*='content']",
-                    ".post-content-input",
-                    "[class*='content'] textarea",
-                    "textarea",
-                ]
-
-                for selector in content_input_selectors:
-                    try:
-                        content_input = activity_page.locator(selector).first
-                        if await content_input.is_visible(timeout=2000):
-                            await content_input.click()
-                            await asyncio.sleep(0.3)
-                            await content_input.fill("Input contents")
-                            print(f"   내용 'Input contents' 입력 (selector: {selector})")
-                            content_found = True
-                            break
-                    except:
-                        continue
+                try:
+                    content_input = activity_page.locator("textarea").first
+                    if await content_input.is_visible(timeout=1000):
+                        await content_input.click()
+                        await content_input.fill("Input contents")
+                        print("   내용 'Input contents' 입력 완료")
+                        content_found = True
+                except:
+                    pass
 
                 results["steps"].append({
                     "step": 7,
@@ -507,7 +443,7 @@ async def test_group_activity_post_create():
                 for selector in color_selectors:
                     try:
                         color_btn = activity_page.locator(selector).first
-                        if await color_btn.is_visible(timeout=2000):
+                        if await color_btn.is_visible(timeout=500):
                             await color_btn.click()
                             print(f"   노란색 컬러 선택 (selector: {selector})")
                             color_selected = True
@@ -531,8 +467,6 @@ async def test_group_activity_post_create():
                                 break
                         except:
                             continue
-
-                await asyncio.sleep(1)
 
                 results["steps"].append({
                     "step": 8,
@@ -563,7 +497,7 @@ async def test_group_activity_post_create():
                 for selector in create_btn_selectors:
                     try:
                         btn = activity_page.locator(selector).first
-                        if await btn.is_visible(timeout=2000):
+                        if await btn.is_visible(timeout=500):
                             await btn.click()
                             print(f"   만들기 버튼 클릭 (selector: {selector})")
                             create_clicked = True
@@ -671,11 +605,7 @@ async def test_group_activity_post_create():
 
             # 메인 페이지 새로고침
             await main_page.reload()
-            await asyncio.sleep(LOAD_WAIT)
-            try:
-                await main_page.wait_for_selector(".loading", state="hidden", timeout=30000)
-            except TimeoutError:
-                pass
+            await fast_page_wait(main_page)
 
             sample_index = await find_sample_row_index(main_page)
 
@@ -737,8 +667,8 @@ async def test_group_activity_post_create():
                 json.dump(results, f, ensure_ascii=False, indent=2)
             print(f"\n   결과 저장: test_result_TC-T-13.json")
 
-            print("\n10초 후 종료...")
-            await asyncio.sleep(10)
+            print("\n2초 후 종료...")
+            await asyncio.sleep(2)
 
         except Exception as e:
             print(f"\n에러: {e}")
